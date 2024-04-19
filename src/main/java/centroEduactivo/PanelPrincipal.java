@@ -5,6 +5,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import centroEduactivo.views.PanelEstdiante;
+
 import java.awt.GridBagLayout;
 import javax.swing.JSplitPane;
 import java.awt.GridBagConstraints;
@@ -60,7 +63,7 @@ public class PanelPrincipal extends JFrame {
 		table = new JTable();
 		splitPane.setLeftComponent(table);
 		
-		JPanel panel = new JPanel();
+		PanelEstdiante panel = new PanelEstdiante();
 		splitPane.setRightComponent(panel);
 	}
 
