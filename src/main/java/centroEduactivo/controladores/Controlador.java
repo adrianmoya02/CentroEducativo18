@@ -39,7 +39,17 @@ public class Controlador {
 				.createNativeQuery("SELECT * FROM " + nombreTabla + ";", this.tipoEntidad).getResultList();
 
 	}
-
+	public Entidad find(int id) {
+		EntityManager em;
+		try {
+			em = getEntityManager();
+			Entidad entidad = (Entidad) em.find(this.tipoEntidad, id);
+			return entidad;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
 	protected static EntityManager getEntityManager() {
 		if (em == null) {
 			em = Persistence.createEntityManagerFactory("CentroEducativo").createEntityManager();

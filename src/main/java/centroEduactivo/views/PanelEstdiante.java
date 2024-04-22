@@ -2,227 +2,732 @@ package centroEduactivo.views;
 
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+
+import centroEduactivo.model.Estudiante;
+import centroEduactivo.model.Sexo;
+
 import javax.swing.JLabel;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Files;
+
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 
 public class PanelEstdiante extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JTextField textField_6;
-	private JTextField textField_7;
+	private JTextField jtfId;
+	private JTextField jtfNombre;
+	private JLabel lblTitulo;
+	private Runnable runnableMostrarPrimerRegistro;
+	private Runnable runnableMostrarSiguienteRegistro;
+	private Runnable runnableMostrarAnteriorRegistro;
+	private Runnable runnableMostrarUltimoRegistro;
+	private JTextField jtfPrimApe;
+	private JTextField jtfSegApe;
+	private JTextField jtfDni;
+	private JTextField jtfDireccion;
+	private JTextField jtfEmail;
+	private JTextField jtfTelefono;
+	private JComboBox<Sexo> jcbSexo;
+	private JScrollPane scrollPane;
+	private byte[] imagenEnArrayDeBytes;
+	private JColorChooser jColorChooser;
+	private JPanel panel = new JPanel();
+	private JButton btnNuevo_1;
+	private Runnable runnableGuardar;
+	private Runnable runnableBorrar;
+	private JTextField jtfColorPreferido;
+	private Color color;
+
 
 	/**
 	 * Create the panel.
 	 */
-	public PanelEstdiante() {
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[]{0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0};
-		gridBagLayout.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		setLayout(gridBagLayout);
+	public PanelEstdiante(Estudiante e) {
+		setLayout(new BorderLayout(0, 0));
+
+		JToolBar toolBar = new JToolBar();
+		add(toolBar, BorderLayout.NORTH);
+
+		JButton btnPrimero = new JButton("");
+		btnPrimero.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableMostrarPrimerRegistro.run();
+			}
+		});
+		btnPrimero.setIcon(new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/gotostart.png")));
+		toolBar.add(btnPrimero);
+
+		JButton btnAnterior = new JButton("");
+		btnAnterior.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableMostrarAnteriorRegistro.run();
+			}
+		});
+		btnAnterior.setIcon(
+				new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/previous.png")));
+		toolBar.add(btnAnterior);
+
+		JButton btnSiguiente = new JButton("");
+		btnSiguiente.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableMostrarSiguienteRegistro.run();
+			}
+		});
+		btnSiguiente.setIcon(
+				new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/next.png")));
+		toolBar.add(btnSiguiente);
+
+		JButton btnUltimo = new JButton("");
+		btnUltimo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableMostrarUltimoRegistro.run();
+			}
+		});
+		btnUltimo.setIcon(new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/gotoend.png")));
+		toolBar.add(btnUltimo);
+
+		btnNuevo_1 = new JButton("");
+		btnNuevo_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+//				runnableNuevo.run();
+				nuevo();
+			}
+		});
+		btnNuevo_1.setIcon(new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/nuevo.png")));
+		toolBar.add(btnNuevo_1);
+
+		JButton btnGuardar = new JButton("");
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableGuardar.run();
+			}
+		});
+		btnGuardar.setIcon(new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/guardar.png")));
+		toolBar.add(btnGuardar);
+
+		JButton btnEliminar = new JButton("");
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runnableBorrar.run();
+			}
+		});
+		btnEliminar.setIcon(new ImageIcon(PanelEstdiante.class.getResource("/CentroEducativo/res/eliminar.png")));
+		toolBar.add(btnEliminar);
+
+		panel = new JPanel();
+		add(panel, BorderLayout.CENTER);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 0, 198, 109, 0 };
+		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		gbl_panel.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		panel.setLayout(gbl_panel);
+
+		lblTitulo = new JLabel("Título del componente");
+		lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 17));
+		GridBagConstraints gbc_lblTitulo = new GridBagConstraints();
+		gbc_lblTitulo.insets = new Insets(0, 0, 5, 0);
+		gbc_lblTitulo.gridwidth = 3;
+		gbc_lblTitulo.gridx = 0;
+		gbc_lblTitulo.gridy = 0;
+		panel.add(lblTitulo, gbc_lblTitulo);
+
+		JLabel lblNewLabel_1 = new JLabel("Id:");
+		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_1.gridx = 0;
+		gbc_lblNewLabel_1.gridy = 1;
+		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
+
+		jtfId = new JTextField();
+		GridBagConstraints gbc_jtfId = new GridBagConstraints();
+		gbc_jtfId.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfId.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfId.gridx = 1;
+		gbc_jtfId.gridy = 1;
+		panel.add(jtfId, gbc_jtfId);
+		jtfId.setColumns(10);
+
+		JLabel lblNewLabel_2 = new JLabel("Nombre:");
+		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
+		gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_2.gridx = 0;
+		gbc_lblNewLabel_2.gridy = 2;
+		panel.add(lblNewLabel_2, gbc_lblNewLabel_2);
+
+		jtfNombre = new JTextField();
+		GridBagConstraints gbc_jtfNombre = new GridBagConstraints();
+		gbc_jtfNombre.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfNombre.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfNombre.gridx = 1;
+		gbc_jtfNombre.gridy = 2;
+		panel.add(jtfNombre, gbc_jtfNombre);
+		jtfNombre.setColumns(10);
 		
-		JPanel contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		GridBagConstraints gbc_contentPane = new GridBagConstraints();
-		gbc_contentPane.fill = GridBagConstraints.BOTH;
-		gbc_contentPane.gridx = 0;
-		gbc_contentPane.gridy = 0;
-		add(contentPane, gbc_contentPane);
-		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{110, 258, 120, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{0.0, 1.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		contentPane.setLayout(gbl_contentPane);
-		
-		JLabel lblNewLabel = new JLabel("Id :");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 0;
-		contentPane.add(lblNewLabel, gbc_lblNewLabel);
-		
-		textField = new JTextField();
-		textField.setEnabled(false);
-		textField.setColumns(10);
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 0;
-		contentPane.add(textField, gbc_textField);
-		
-		JLabel lblNombre = new JLabel("Nombre :");
-		GridBagConstraints gbc_lblNombre = new GridBagConstraints();
-		gbc_lblNombre.anchor = GridBagConstraints.EAST;
-		gbc_lblNombre.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNombre.gridx = 0;
-		gbc_lblNombre.gridy = 1;
-		contentPane.add(lblNombre, gbc_lblNombre);
-		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_1.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_1.gridx = 1;
-		gbc_textField_1.gridy = 1;
-		contentPane.add(textField_1, gbc_textField_1);
-		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane.gridheight = 4;
+		gbc_scrollPane.gridheight = 3;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.gridx = 2;
-		gbc_scrollPane.gridy = 1;
-		contentPane.add(scrollPane, gbc_scrollPane);
-		
-		JLabel lblApellido = new JLabel("Primer apellido :");
-		GridBagConstraints gbc_lblApellido = new GridBagConstraints();
-		gbc_lblApellido.anchor = GridBagConstraints.EAST;
-		gbc_lblApellido.insets = new Insets(0, 0, 5, 5);
-		gbc_lblApellido.gridx = 0;
-		gbc_lblApellido.gridy = 2;
-		contentPane.add(lblApellido, gbc_lblApellido);
-		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		GridBagConstraints gbc_textField_2 = new GridBagConstraints();
-		gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_2.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_2.gridx = 1;
-		gbc_textField_2.gridy = 2;
-		contentPane.add(textField_2, gbc_textField_2);
-		
-		JLabel lblSegundoApellido = new JLabel("Segundo apellido :");
+		gbc_scrollPane.gridy = 2;
+		panel.add(scrollPane, gbc_scrollPane);
+
+		JLabel lblPrimerApellido = new JLabel("Primer Apellido");
+		GridBagConstraints gbc_lblPrimerApellido = new GridBagConstraints();
+		gbc_lblPrimerApellido.anchor = GridBagConstraints.EAST;
+		gbc_lblPrimerApellido.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPrimerApellido.gridx = 0;
+		gbc_lblPrimerApellido.gridy = 3;
+		panel.add(lblPrimerApellido, gbc_lblPrimerApellido);
+
+		jtfPrimApe = new JTextField();
+		GridBagConstraints gbc_jtfPrimApe = new GridBagConstraints();
+		gbc_jtfPrimApe.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfPrimApe.anchor = GridBagConstraints.NORTH;
+		gbc_jtfPrimApe.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfPrimApe.gridx = 1;
+		gbc_jtfPrimApe.gridy = 3;
+		panel.add(jtfPrimApe, gbc_jtfPrimApe);
+		jtfPrimApe.setColumns(10);
+
+		JLabel lblSegundoApellido = new JLabel("Segundo Apellido");
 		GridBagConstraints gbc_lblSegundoApellido = new GridBagConstraints();
 		gbc_lblSegundoApellido.anchor = GridBagConstraints.EAST;
 		gbc_lblSegundoApellido.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSegundoApellido.gridx = 0;
-		gbc_lblSegundoApellido.gridy = 3;
-		contentPane.add(lblSegundoApellido, gbc_lblSegundoApellido);
-		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		GridBagConstraints gbc_textField_3 = new GridBagConstraints();
-		gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_3.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_3.gridx = 1;
-		gbc_textField_3.gridy = 3;
-		contentPane.add(textField_3, gbc_textField_3);
-		
-		JLabel lblSexo = new JLabel("Sexo :");
+		gbc_lblSegundoApellido.gridy = 4;
+		panel.add(lblSegundoApellido, gbc_lblSegundoApellido);
+
+		jtfSegApe = new JTextField();
+		GridBagConstraints gbc_jtfSegApe = new GridBagConstraints();
+		gbc_jtfSegApe.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfSegApe.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfSegApe.gridx = 1;
+		gbc_jtfSegApe.gridy = 4;
+		panel.add(jtfSegApe, gbc_jtfSegApe);
+		jtfSegApe.setColumns(10);
+
+		JLabel lblSexo = new JLabel("Sexo");
 		GridBagConstraints gbc_lblSexo = new GridBagConstraints();
 		gbc_lblSexo.anchor = GridBagConstraints.EAST;
 		gbc_lblSexo.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSexo.gridx = 0;
-		gbc_lblSexo.gridy = 4;
-		contentPane.add(lblSexo, gbc_lblSexo);
+		gbc_lblSexo.gridy = 5;
+		panel.add(lblSexo, gbc_lblSexo);
+
+		jcbSexo = new JComboBox<Sexo>();
+		GridBagConstraints gbc_jcbSexo = new GridBagConstraints();
+		gbc_jcbSexo.insets = new Insets(0, 0, 5, 5);
+		gbc_jcbSexo.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jcbSexo.gridx = 1;
+		gbc_jcbSexo.gridy = 5;
+		panel.add(jcbSexo, gbc_jcbSexo);
 		
-		JComboBox comboBox = new JComboBox();
-		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
-		gbc_comboBox.gridx = 1;
-		gbc_comboBox.gridy = 4;
-		contentPane.add(comboBox, gbc_comboBox);
-		
-		JLabel lblDni = new JLabel("DNI :");
-		GridBagConstraints gbc_lblDni = new GridBagConstraints();
-		gbc_lblDni.anchor = GridBagConstraints.EAST;
-		gbc_lblDni.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDni.gridx = 0;
-		gbc_lblDni.gridy = 5;
-		contentPane.add(lblDni, gbc_lblDni);
-		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		GridBagConstraints gbc_textField_4 = new GridBagConstraints();
-		gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_4.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_4.gridx = 1;
-		gbc_textField_4.gridy = 5;
-		contentPane.add(textField_4, gbc_textField_4);
-		
-		JButton btnNewButton = new JButton("Seleccionar Imagen");
+		JButton btnNewButton = new JButton("Cambiar imagen");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				seleccionaImagen();
+			}
+		});
 		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
 		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
 		gbc_btnNewButton.gridx = 2;
 		gbc_btnNewButton.gridy = 5;
-		contentPane.add(btnNewButton, gbc_btnNewButton);
-		
-		JLabel lblDireccion = new JLabel("Direccion :");
+		panel.add(btnNewButton, gbc_btnNewButton);
+
+		JLabel lblDni = new JLabel("DNI");
+		GridBagConstraints gbc_lblDni = new GridBagConstraints();
+		gbc_lblDni.anchor = GridBagConstraints.EAST;
+		gbc_lblDni.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDni.gridx = 0;
+		gbc_lblDni.gridy = 6;
+		panel.add(lblDni, gbc_lblDni);
+
+		jtfDni = new JTextField();
+		GridBagConstraints gbc_jtfDni = new GridBagConstraints();
+		gbc_jtfDni.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfDni.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfDni.gridx = 1;
+		gbc_jtfDni.gridy = 6;
+		panel.add(jtfDni, gbc_jtfDni);
+		jtfDni.setColumns(10);
+
+		JLabel lblDireccion = new JLabel("Direccion");
 		GridBagConstraints gbc_lblDireccion = new GridBagConstraints();
 		gbc_lblDireccion.anchor = GridBagConstraints.EAST;
 		gbc_lblDireccion.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDireccion.gridx = 0;
-		gbc_lblDireccion.gridy = 6;
-		contentPane.add(lblDireccion, gbc_lblDireccion);
-		
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
-		GridBagConstraints gbc_textField_5 = new GridBagConstraints();
-		gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_5.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_5.gridx = 1;
-		gbc_textField_5.gridy = 6;
-		contentPane.add(textField_5, gbc_textField_5);
-		
-		JLabel lblEmail = new JLabel("Email :");
+		gbc_lblDireccion.gridy = 7;
+		panel.add(lblDireccion, gbc_lblDireccion);
+
+		jtfDireccion = new JTextField();
+		GridBagConstraints gbc_jtfDireccion = new GridBagConstraints();
+		gbc_jtfDireccion.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfDireccion.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfDireccion.gridx = 1;
+		gbc_jtfDireccion.gridy = 7;
+		panel.add(jtfDireccion, gbc_jtfDireccion);
+		jtfDireccion.setColumns(10);
+
+		JLabel lblEmail = new JLabel("Email");
 		GridBagConstraints gbc_lblEmail = new GridBagConstraints();
 		gbc_lblEmail.anchor = GridBagConstraints.EAST;
 		gbc_lblEmail.insets = new Insets(0, 0, 5, 5);
 		gbc_lblEmail.gridx = 0;
-		gbc_lblEmail.gridy = 7;
-		contentPane.add(lblEmail, gbc_lblEmail);
-		
-		textField_6 = new JTextField();
-		textField_6.setColumns(10);
-		GridBagConstraints gbc_textField_6 = new GridBagConstraints();
-		gbc_textField_6.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_6.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_6.gridx = 1;
-		gbc_textField_6.gridy = 7;
-		contentPane.add(textField_6, gbc_textField_6);
-		
-		JLabel lblTelefono = new JLabel("Telefono :");
+		gbc_lblEmail.gridy = 8;
+		panel.add(lblEmail, gbc_lblEmail);
+
+		jtfEmail = new JTextField();
+		GridBagConstraints gbc_jtfEmail = new GridBagConstraints();
+		gbc_jtfEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfEmail.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfEmail.gridx = 1;
+		gbc_jtfEmail.gridy = 8;
+		panel.add(jtfEmail, gbc_jtfEmail);
+		jtfEmail.setColumns(10);
+
+		JLabel lblTelefono = new JLabel("Telefono");
 		GridBagConstraints gbc_lblTelefono = new GridBagConstraints();
 		gbc_lblTelefono.anchor = GridBagConstraints.EAST;
 		gbc_lblTelefono.insets = new Insets(0, 0, 5, 5);
 		gbc_lblTelefono.gridx = 0;
-		gbc_lblTelefono.gridy = 8;
-		contentPane.add(lblTelefono, gbc_lblTelefono);
-		
-		textField_7 = new JTextField();
-		textField_7.setColumns(10);
-		GridBagConstraints gbc_textField_7 = new GridBagConstraints();
-		gbc_textField_7.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_7.insets = new Insets(0, 0, 5, 5);
-		gbc_textField_7.gridx = 1;
-		gbc_textField_7.gridy = 8;
-		contentPane.add(textField_7, gbc_textField_7);
-		
-		JButton btnNewButton_1 = new JButton("Guardar");
-		GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
-		gbc_btnNewButton_1.gridx = 2;
-		gbc_btnNewButton_1.gridy = 9;
-		contentPane.add(btnNewButton_1, gbc_btnNewButton_1);
+		gbc_lblTelefono.gridy = 9;
+		panel.add(lblTelefono, gbc_lblTelefono);
 
+		jtfTelefono = new JTextField();
+		GridBagConstraints gbc_jtfTelefono = new GridBagConstraints();
+		gbc_jtfTelefono.insets = new Insets(0, 0, 5, 5);
+		gbc_jtfTelefono.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfTelefono.gridx = 1;
+		gbc_jtfTelefono.gridy = 9;
+		panel.add(jtfTelefono, gbc_jtfTelefono);
+		jtfTelefono.setColumns(10);
+		jtfId.setEnabled(false);
+		
+		JLabel lblColorPreferido = new JLabel("Color preferido:");
+		GridBagConstraints gbc_lblColorPreferido = new GridBagConstraints();
+		gbc_lblColorPreferido.anchor = GridBagConstraints.EAST;
+		gbc_lblColorPreferido.insets = new Insets(0, 0, 0, 5);
+		gbc_lblColorPreferido.gridx = 0;
+		gbc_lblColorPreferido.gridy = 10;
+		panel.add(lblColorPreferido, gbc_lblColorPreferido);
+		
+		jtfColorPreferido = new JTextField();
+		GridBagConstraints gbc_jtfColorPreferido = new GridBagConstraints();
+		gbc_jtfColorPreferido.insets = new Insets(0, 0, 0, 5);
+		gbc_jtfColorPreferido.fill = GridBagConstraints.HORIZONTAL;
+		gbc_jtfColorPreferido.gridx = 1;
+		gbc_jtfColorPreferido.gridy = 10;
+		panel.add(jtfColorPreferido, gbc_jtfColorPreferido);
+		jtfColorPreferido.setColumns(10);
+		
+		JButton btnCambiarColor = new JButton("Cambiar color");
+		btnCambiarColor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				seleccionaColor();
+			}
+		});
+		GridBagConstraints gbc_btnCambiarColor = new GridBagConstraints();
+		gbc_btnCambiarColor.gridx = 2;
+		gbc_btnCambiarColor.gridy = 10;
+		panel.add(btnCambiarColor, gbc_btnCambiarColor);
+		
+		setEstudiante(e);
+	}
+	public void setTitulo(String newTitulo) {
+		this.lblTitulo.setText(newTitulo);
+	}
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void setId(int id) {
+		this.jtfId.setText("" + id);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getNombre() {
+		return jtfNombre.getText();
+	}
+
+	public void setNombre(String n) {
+		this.jtfNombre.setText("" + n);
+	}
+
+	public String getAp1() {
+		return jtfPrimApe.getText();
+	}
+
+	public void setAp1(String n) {
+		this.jtfPrimApe.setText("" + n);
+	}
+
+	public String getAp2() {
+		return jtfSegApe.getText();
+	}
+
+	public void setAp2(String n) {
+		this.jtfSegApe.setText("" + n);
+	}
+
+	public String getDire() {
+		return jtfDireccion.getText();
+	}
+
+	public void setDire(String n) {
+		this.jtfDireccion.setText("" + n);
+	}
+
+	public String getDni() {
+		return jtfDni.getText();
+	}
+
+	public void setDni(String n) {
+		this.jtfDni.setText("" + n);
+	}
+
+	public String getMail() {
+		return jtfEmail.getText();
+	}
+
+	public void setMail(String n) {
+		this.jtfEmail.setText("" + n);
+	}
+
+	public String getTlf() {
+		return jtfTelefono.getText();
+	}
+
+	public void setTlf(String n) {
+		this.jtfTelefono.setText("" + n);
+	}
+
+	public int getSexo() {
+		Sexo o;
+		o = (Sexo) this.jcbSexo.getSelectedItem();
+		return o.getId();
+	}
+	
+	public JComboBox<Sexo> setSexo() {
+		return jcbSexo;
+		
+	}
+
+	public byte[] getImagen() {
+		return imagenEnArrayDeBytes;
+	}
+	
+	public void setImagen(byte[] imagen) {
+		imagenEnArrayDeBytes = imagen;
+		
+		mostrarImagen();
+	}
+
+	public String getColor() {
+		return jtfColorPreferido.getText();
+	}
+
+	public void setColor(String n) {
+		this.jtfColorPreferido.setText("" + n);
+		
+		mostrarColor();
+	}
+	
+
+	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public int getId() {
+		return Integer.parseInt(this.jtfId.getText());
+	}
+
+	public Runnable getRunnableMostrarPrimerRegistro() {
+		return runnableMostrarPrimerRegistro;
+	}
+
+	public void setRunnableMostrarPrimerRegistro(Runnable runnableMostrarPrimerRegistro) {
+		this.runnableMostrarPrimerRegistro = runnableMostrarPrimerRegistro;
+	}
+
+	public Runnable getRunnableMostrarSiguienteRegistro() {
+		return runnableMostrarSiguienteRegistro;
+	}
+
+	public void setRunnableMostrarSiguienteRegistro(Runnable runnableMostrarSiguienteRegistro) {
+		this.runnableMostrarSiguienteRegistro = runnableMostrarSiguienteRegistro;
+	}
+
+	public Runnable getRunnableMostrarAnteriorRegistro() {
+		return runnableMostrarAnteriorRegistro;
+	}
+
+	public void setRunnableMostrarAnteriorRegistro(Runnable runnableMostrarAnteriorRegistro) {
+		this.runnableMostrarAnteriorRegistro = runnableMostrarAnteriorRegistro;
+	}
+
+	public Runnable getRunnableMostrarUltimoRegistro() {
+		return runnableMostrarUltimoRegistro;
+	}
+
+	public void setRunnableMostrarUltimoRegistro(Runnable runnableMostrarUltimoRegistro) {
+		this.runnableMostrarUltimoRegistro = runnableMostrarUltimoRegistro;
+	}
+
+	
+	
+
+	public JButton getBtnNuevo_1() {
+		return btnNuevo_1;
+	}
+
+	public void setBtnNuevo_1(JButton btnNuevo_1) {
+		this.btnNuevo_1 = btnNuevo_1;
+	}
+
+	public Runnable getRunnableGuardar() {
+		return runnableGuardar;
+	}
+
+	public void setRunnableGuardar(Runnable runnableGuardar) {
+		this.runnableGuardar = runnableGuardar;
+	}
+
+	public JTextField getJtfId() {
+		return jtfId;
+	}
+
+	public void setJtfId(JTextField jtfId) {
+		this.jtfId = jtfId;
+	}
+
+	public JTextField getJtfNombre() {
+		return jtfNombre;
+	}
+
+	public void setJtfNombre(JTextField jtfNombre) {
+		this.jtfNombre = jtfNombre;
+	}
+
+	public JLabel getLblTitulo() {
+		return lblTitulo;
+	}
+
+	public void setLblTitulo(JLabel lblTitulo) {
+		this.lblTitulo = lblTitulo;
+	}
+
+	public JTextField getJtfPrimApe() {
+		return jtfPrimApe;
+	}
+
+	public void setJtfPrimApe(JTextField jtfPrimApe) {
+		this.jtfPrimApe = jtfPrimApe;
+	}
+
+	public JTextField getJtfSegApe() {
+		return jtfSegApe;
+	}
+
+	public void setJtfSegApe(JTextField jtfSegApe) {
+		this.jtfSegApe = jtfSegApe;
+	}
+
+	public JTextField getJtfDni() {
+		return jtfDni;
+	}
+
+	public void setJtfDni(JTextField jtfDni) {
+		this.jtfDni = jtfDni;
+	}
+
+	public JTextField getJtfDireccion() {
+		return jtfDireccion;
+	}
+
+	public void setJtfDireccion(JTextField jtfDireccion) {
+		this.jtfDireccion = jtfDireccion;
+	}
+
+	public JTextField getJtfEmail() {
+		return jtfEmail;
+	}
+
+	public void setJtfEmail(JTextField jtfEmail) {
+		this.jtfEmail = jtfEmail;
+	}
+
+	public JTextField getJtfTelefono() {
+		return jtfTelefono;
+	}
+
+	public void setJtfTelefono(JTextField jtfTelefono) {
+		this.jtfTelefono = jtfTelefono;
+	}
+	
+	public JComboBox<Sexo> getJcbSexo() {
+		return jcbSexo;
+	}
+
+	public void setJcbSexo(JComboBox<Sexo> jcbSexo) {
+		this.jcbSexo = jcbSexo;
+	}
+	
+	public JTextField getJtfColorPreferido() {
+		return jtfColorPreferido;
+	}
+	
+	public void setJtfColorPreferido(JTextField jtfColorPreferido) {
+		this.jtfColorPreferido = jtfColorPreferido;
+	}
+
+
+	private void nuevo() {
+		jtfId.setText("");
+		jtfNombre.setText("");
+		jtfDni.setText("");
+		jtfPrimApe.setText("");
+		jtfSegApe.setText("");
+		setImagen(null);
+		jtfDireccion.setText("");
+		jtfTelefono.setText("");
+		jtfEmail.setText("");
+		jtfColorPreferido.setText("");
+		jcbSexo.setSelectedItem(null);
+
+	}
+
+	public Runnable getRunnableBorrar() {
+		return runnableBorrar;
+	}
+
+	public void setRunnableBorrar(Runnable runnableBorrar) {
+		this.runnableBorrar = runnableBorrar;
+	}
+	
+	/**
+	 * 
+	 */
+	private void seleccionaImagen () {
+		JFileChooser jfileChooser = new JFileChooser();
+		
+		// Configurando el componente
+		
+		// Tipo de selección que se hace en el diálogo
+		jfileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES); // Sólo selecciona ficheros
+
+		// Filtro del tipo de ficheros que puede abrir
+		jfileChooser.setFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return "Archivos de imagen *.jpg *.png *.gif";
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory() || (f.isFile() &&
+						(f.getAbsolutePath().toLowerCase().endsWith(".jpg") || 
+								f.getAbsolutePath().toLowerCase().endsWith(".jpeg")|| 
+								f.getAbsolutePath().toLowerCase().endsWith(".png")|| 
+								f.getAbsolutePath().toLowerCase().endsWith(".gif")))) 
+					return true;
+				return false;
+			}
+		});
+		
+		// Abro el diálogo para la elección del usuario
+		int seleccionUsuario = jfileChooser.showOpenDialog(null);
+		
+		if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
+			File fichero = jfileChooser.getSelectedFile();
+			
+			if (fichero.isFile()) {
+				try {
+					this.imagenEnArrayDeBytes = Files.readAllBytes(fichero.toPath());
+					mostrarImagen();
+				}
+				catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+	}
+		
+	
+	/**
+	 * 
+	 */
+	private void mostrarImagen () {
+		if (imagenEnArrayDeBytes != null && imagenEnArrayDeBytes.length > 0) {
+			ImageIcon icono = new ImageIcon(imagenEnArrayDeBytes);
+			JLabel lblIcono = new JLabel(icono);
+			scrollPane.setViewportView(lblIcono);
+		}
+		else {
+			JLabel lblIcono = new JLabel("Sin imagen");
+			scrollPane.setViewportView(lblIcono);
+		}
+
+	}
+	
+	
+	/**
+	 * 
+	 */
+	private void seleccionaColor () {
+		Color color = jColorChooser.showDialog(null, "Seleccione un Color", Color.gray);
+		// Si el usuario pulsa sobre aceptar, el color elegido no será nulo
+		if (color != null) {
+			String strColor = "#"+Integer.toHexString(color.getRGB()).substring(2);
+			this.jtfColorPreferido.setText(strColor);
+			this.panel.setBackground(color);
+		}
+	}
+	
+	private void mostrarColor() {
+		if (!this.getJtfColorPreferido().getText().isEmpty()) {
+			Color color = Color.decode(this.getJtfColorPreferido().getText());
+			this.panel.setBackground(color);
+		} else if (this.getJtfColorPreferido().getText().isEmpty()){
+			this.panel.setBackground(Color.WHITE);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void setEstudiante(Estudiante e) {
+		this.jtfId.setText("" + e.getId());		
+		this.jtfNombre.setText(e.getNombre());		
+		this.jtfPrimApe.setText(e.getApellido_1());		
+		this.jtfSegApe.setText(e.getApellido_2());		
 	}
 
 }

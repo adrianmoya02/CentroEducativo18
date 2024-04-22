@@ -9,5 +9,10 @@
   		<artifactId>20240409-JPA-Gimnasio</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.fbmsoft</groupId>
+  		<artifactId>JTable-CentroEducativo</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>
